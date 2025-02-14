@@ -1,18 +1,25 @@
-const WebSocket = require('ws');
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 
-const server = new WebSocket.Server({ port: 3210 });
+const app = express();
+const PORT = process.env.PORT || 3210;  // Usa la porta fornita da Render
 
-server.on('connection', socket => {
-    console.log('✅ Client connesso');
-    socket.send('Benvenuto!');
-
-    socket.on('message', message => {
-        console.log('📨 Messaggio ricevuto:', message);
-        socket.send('Echo: ' + message);
-    });
-
-    socket.on('close', () => console.log('❌ Client disconnesso'));
-    socket.on('error', err => console.error('⚠️ Errore:', err));
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Permette connessioni da qualsiasi dominio (modifica se necessario)
+  }
 });
 
-console.log('WebSocket server in ascolto');
+io.on("connection", (socket) => {
+  console.log("Un utente si è connesso:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("Un utente si è disconnesso:", socket.id);
+  });
+});
+
+server.listen(PORT, () => {
+  console.log(`Server in ascolto sulla porta ${PORT}`);
+});
