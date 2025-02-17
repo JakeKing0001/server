@@ -1,27 +1,24 @@
-const express = require("express");
-const http = require("http");
-const WebSocket = require("ws");
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
-
-// Broadcast to all clients
-wss.broadcast = (data) => wss.clients.forEach((client) => client.readyState === WebSocket.OPEN && client.send(data));
-
 wss.on("connection", (ws) => {
   console.log("✅ Client connesso");
+
+  ws.isAlive = true;
+  ws.on("pong", () => (ws.isAlive = true));
+
+  const interval = setInterval(() => {
+    wss.clients.forEach((client) => {
+      if (!client.isAlive) return client.terminate();
+      client.isAlive = false;
+      client.ping();
+    });
+  }, 30000); // Controlla ogni 30 secondi
 
   ws.on("message", (message) => {
     console.log("📩 Messaggio ricevuto:", message);
     wss.broadcast(`ECO: ${message}`);
   });
 
-  ws.on("close", () => console.log("❌ Client disconnesso"));
-});
-
-server.listen(PORT, () => {
-  console.log(`🚀 Server in ascolto su ${PORT}`);
+  ws.on("close", () => {
+    clearInterval(interval);
+    console.log("❌ Client disconnesso");
+  });
 });
