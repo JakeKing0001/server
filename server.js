@@ -2,7 +2,13 @@ const express = require("express");
 const http = require("http");
 const WebSocket = require("ws");
 
-ws.on("connection", (ws) => {
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+wss.on("connection", (ws) => {
   console.log("✅ Client connesso");
 
   ws.isAlive = true;
