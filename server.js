@@ -1,4 +1,8 @@
-wss.on("connection", (ws) => {
+const express = require("express");
+const http = require("http");
+const WebSocket = require("ws");
+
+ws.on("connection", (ws) => {
   console.log("✅ Client connesso");
 
   ws.isAlive = true;
