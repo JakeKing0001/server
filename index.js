@@ -43,7 +43,7 @@ io.on('connection', (socket) => {
 });
 
 
-const PORT = parseINT(process.env.PORT, 10) || 3001;
+const PORT = parseInt(process.env.PORT, 10) || 3001;
 server.listen(PORT, () => {
   console.log(`🚀 Server in ascolto su http://localhost:${PORT}`);
 });
